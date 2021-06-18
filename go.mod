@@ -1,4 +1,4 @@
-module github.com/stanislas-m/amqp-work-adapter
+module github.com/aazbeltran/amqp-work-adapter
 
 require (
 	github.com/gobuffalo/buffalo v0.13.3
