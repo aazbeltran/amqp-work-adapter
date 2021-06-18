@@ -24,6 +24,8 @@ type Options struct {
 	Name string
 	// Exchange is used to customize the AMQP exchange name. Defaults to "".
 	Exchange string
+	// ExchangeType is used to define the exchange type if needed
+	ExchangeType string
 	// MaxConcurrency restricts the amount of workers in parallel.
 	MaxConcurrency int
 }
@@ -53,6 +55,7 @@ func New(opts Options) *Adapter {
 		Logger:         opts.Logger,
 		consumerName:   opts.Name,
 		exchange:       opts.Exchange,
+		exchangeType:   opts.ExchangeType,
 		maxConcurrency: opts.MaxConcurrency,
 		ctx:            ctx,
 	}
@@ -65,6 +68,7 @@ type Adapter struct {
 	Logger         Logger
 	consumerName   string
 	exchange       string
+	exchangeType   string
 	ctx            context.Context
 	maxConcurrency int
 }
@@ -91,14 +95,19 @@ func (q *Adapter) Start(ctx context.Context) error {
 
 	// Declare exchange
 	if q.exchange != "" {
+                exchangeType := q.exchangeType
+                
+                if exchangeType == "" {
+                        exchangeType = "topic"
+		}
 		err = c.ExchangeDeclare(
-			q.exchange, // Name
-			"direct",   // Type
-			true,       // Durable
-			false,      // Auto-deleted
-			false,      // Internal
-			false,      // No wait
-			nil,        // Args
+			q.exchange,      // Name
+			exchangeType,    // Type
+			true,            // Durable
+			false,           // Auto-deleted
+			false,           // Internal
+			false,           // No wait
+			nil,             // Args
 		)
 
 		if err != nil {
